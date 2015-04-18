@@ -60,6 +60,7 @@ Game.Load.prototype = {
     this.game.load.spritesheet('tiles', 'assets/images/tiles.png', 16, 16, 4);
     this.game.load.image('player', 'assets/images/player.png');
     this.game.load.image('shadow', 'assets/images/shadow.png');
+    this.game.load.tilemap('level1', 'assets/maps/level1.json', null, Phaser.Tilemap.TILED_JSON);
 
 
     // Music Track

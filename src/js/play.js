@@ -28,11 +28,27 @@ Game.Play.prototype = {
 
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    this.player = this.game.add.sprite(Game.w/2, Game.h/2, 'player')
-    this.game.physics.arcade.enable(this.player)
+    this.map = this.game.add.tilemap('level1');
+    this.map.addTilesetImage('tiles', 'tiles');
+    this.map.setCollision(2);
+    
+    this.layer = this.map.createLayer('layer1') 
 
-    this.shadow = this.game.add.sprite(Game.w/2+64, Game.h/2, 'shadow')
+    this.layer.resizeWorld();
+
+    console.log(this.map.getObjectIndex('start'))
+    console.log(this.map.getObjectIndex('end'))
+
+    // this.map.createFromObjects('objects', 4, 'player', 0, true, false);
+
+    this.player = this.game.add.sprite(0, 0, 'player')
+    this.game.physics.arcade.enable(this.player)
+    this.player.body.collideWorldBounds = true;
+
+    this.shadow = this.game.add.sprite(0, 0, 'shadow')
+    this.shadow.alpha = 0;  
     this.game.physics.arcade.enable(this.shadow)
+    this.shadow.body.collideWorldBounds = true;
 
     this.playerSpeed = 50;
     this.shadowSpeed = 150;
@@ -53,18 +69,20 @@ Game.Play.prototype = {
 
     spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
+
+
+
   },
 
   update: function() {
+    this.game.physics.arcade.collide(this.player, this.layer);
+    this.game.physics.arcade.collide(this.shadow, this.layer);
 
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
 
     this.shadow.body.velocity.x = 0;
     this.shadow.body.velocity.y = 0;
-    // spaceKey.onDown.add(function() {
-    //   this.meditating = !this.meditating;
-    // }, this);
 
     if (spaceKey.isDown && this.switching === false) {
       this.meditating = !this.meditating;
@@ -72,6 +90,13 @@ Game.Play.prototype = {
     }
     spaceKey.onUp.add(function() {
       this.switching = false;
+      if (this.meditating) {
+        this.shadow.alpha = 1;
+        this.shadow.x = this.player.x;
+        this.shadow.y = this.player.y;
+      }else {
+        this.shadow.alpha = 0;
+      }
     },this);
 
 
@@ -96,7 +121,6 @@ Game.Play.prototype = {
         this.player.body.velocity.x = this.playerSpeed;
       }     
     }    
-
 
 
     // // Toggle Music

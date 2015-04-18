@@ -3,9 +3,48 @@
         {
          "data":[1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 2, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2],
          "height":8,
-         "name":"Tile Layer 1",
+         "name":"layer1",
          "opacity":1,
          "type":"tilelayer",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "height":8,
+         "name":"objects",
+         "objects":[
+                {
+                 "gid":3,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+                     "light":"true"
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":96,
+                 "y":64
+                }, 
+                {
+                 "gid":4,
+                 "height":0,
+                 "name":"start",
+                 "properties":
+                    {
+                     "":""
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":0,
+                 "y":16
+                }],
+         "opacity":1,
+         "type":"objectgroup",
          "visible":true,
          "width":12,
          "x":0,
@@ -21,8 +60,8 @@
         {
          "firstgid":1,
          "image":"..\/images\/tiles.png",
-         "imageheight":32,
-         "imagewidth":32,
+         "imageheight":16,
+         "imagewidth":64,
          "margin":0,
          "name":"tiles",
          "properties":
