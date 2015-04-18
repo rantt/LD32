@@ -7,18 +7,25 @@ var dKey;
 var Player = function(game) {
   this.game = game;
   this.ninja = null;
-  this.shadow = null;
-  this.ninjaSpeed = 75;
-  this.shadowSpeed = 150;
-  this.meditating = false;
-  this.ninja = this.game.add.sprite(0, 0, 'player');
-  this.game.physics.arcade.enable(this.ninja);
-  this.ninja.body.collideWorldBounds = true;
 
-  this.shadow = this.game.add.sprite(0, 0, 'shadow');
-  this.shadow.alpha = 0;  
-  this.game.physics.arcade.enable(this.shadow);
-  this.shadow.body.collideWorldBounds = true;
+  this.edgeTimer = 0;
+  this.jumpSpeed = 350;
+  this.jumpTimer = 0;
+  this.moveSpeed = 150;
+  this.facing = 'right';
+  this.wasStanding = false;
+
+  this.game.load.spritesheet('ninja', 'assets/images/ninja', 18, 20, 25);
+  this.ninja = this.game.add.sprite(32,32, 'ninja');
+  this.game.physics.arcade.enable(this.ninja);
+  
+  this.ninja.anchor.setTo(0.5, 0.5);
+  this.ninja.animations.add('right', [2, 3], 15, true);
+  this.ninja.animations.add('left', [4, 5], 15, true);
+
+  this.ninja.body.collideWorldBounds = true;
+  this.ninja.body.gravity.y = 750;
+  this.game.camera.follow(this.ninja, Phaser.Camera.FOLLOW_PLATFORMER);
 
   //Setup WASD and extra keys
   wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
@@ -36,51 +43,61 @@ Player.prototype = {
   movements: function(layer) {
 
     this.game.physics.arcade.collide(this.ninja, layer);
-    this.game.physics.arcade.collide(this.shadow, layer);
+
+    var standing = this.ninja.body.blocked.down || this.ninja.body.touching.down;
 
     this.ninja.body.velocity.x = 0;
-    this.ninja.body.velocity.y = 0;
 
-    this.shadow.body.velocity.x = 0;
-    this.shadow.body.velocity.y = 0;
-
-    if (spaceKey.isDown && this.switching === false) {
-      this.meditating = !this.meditating;
-      this.switching = true;
-    }
-    spaceKey.onUp.add(function() {
-      this.switching = false;
-      if (this.meditating) {
-        this.shadow.alpha = 1;
-        this.shadow.x = this.ninja.x;
-        this.shadow.y = this.ninja.y;
-      }else {
-        this.shadow.alpha = 0;
+    if (aKey.isDown) {
+      this.ninja.body.velocity.x = -this.moveSpeed;
+      if (this.facing !== 'left') {
+        // this.ninja.animations.play('left');
+        this.ninja.play('left');
+        this.facing = 'left';
       }
-    },this);
-
-
-    if (this.meditating) {
-      if (wKey.isDown) {
-        this.shadow.body.velocity.y = -this.shadowSpeed;
-      }else if (sKey.isDown) {
-        this.shadow.body.velocity.y = this.shadowSpeed;
-      }else if (aKey.isDown) {
-        this.shadow.body.velocity.x = -this.shadowSpeed;
-      }else if (dKey.isDown) {
-        this.shadow.body.velocity.x = this.shadowSpeed;
+      if (this.ninja.body.blocked.down === false) {
+        this.ninja.frame = 7;
+      }
+    }else if (dKey.isDown) {
+      this.ninja.body.velocity.x = this.moveSpeed;
+      if (this.facing !== 'right') {
+        // this.ninja.animations.play('right');
+        this.ninja.play('right');
+        this.facing = 'right';
+      }
+      if (this.ninja.body.blocked.down === false) {
+        this.ninja.frame = 6;
       }
     }else {
-       if (wKey.isDown) {
-        this.ninja.body.velocity.y = -this.ninjaSpeed;
-      }else if (sKey.isDown) {
-        this.ninja.body.velocity.y = this.ninjaSpeed;
-      }else if (aKey.isDown) {
-        this.ninja.body.velocity.x = -this.ninjaSpeed;
-      }else if (dKey.isDown) {
-        this.ninja.body.velocity.x = this.ninjaSpeed;
-      }     
-    }    
+      if (this.facing !== 'idle') {
+        this.ninja.animations.stop();
+        if(this.facing === 'left') {
+          this.ninja.frame = 1;
+        }else {
+          this.ninja.frame = 0;
+        }
+        facing = 'idle';
+      }
+    }
+
+    if (!standing && this.wasStanding) {
+      this.edgeTimer = this.game.time.now + 250;
+    }
+
+    if ((standing || this.game.time.now <= this.edgeTimer) && spaceKey.isDown && this.game.time.now > this.jumpTimer) {
+      console.log('jumping');
+      this.ninja.body.velocity.y = -this.jumpSpeed;
+      this.jumpTimer = this.game.time.now + 750;
+    }
+    this.wasStanding = standing;
+
+    //Lower Jump Height if released early
+    spaceKey.onUp.add(function() {
+      if (this.ninja.body.velocity.y < -150) {
+        this.ninja.body.velocity.y = -100;
+      }
+    }, this);
+
 
 
   }

@@ -63,7 +63,7 @@ Game.Play.prototype = {
   //   }
   // },
   render: function() {
-    // this.game.debug.body(this.player);
+    this.game.debug.body(this.player.ninja);
   //   this.game.debug.text('Meditating: ' + this.meditating, 32, 96);
   }
 

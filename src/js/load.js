@@ -23,7 +23,7 @@ Game.Boot.prototype = {
 		this.game.load.image('title', 'assets/images/title.png');
 		this.game.load.image('instructions', 'assets/images/instructions.png');
 
-    this.game.renderer.renderSession.roundPixels = true;
+    // this.game.renderer.renderSession.roundPixels = true;
 
     //Automatically Scale
     this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -46,6 +46,13 @@ Game.Load = function(game) {
 };
 
 Game.Load.prototype = {
+  init: function() {
+    // this.game.renderer.renderSession.round.Pixels = true;
+    this.game.renderer.renderSession.roundPixels = true;
+    this.physics.startSystem(Phaser.Physics.ARCADE);
+    this.physics.arcade.gravity.y = 750;
+
+  },
   preload: function() {
     
     //Debug Plugin
@@ -61,6 +68,9 @@ Game.Load.prototype = {
     this.game.load.image('player', 'assets/images/player.png');
     this.game.load.image('shadow', 'assets/images/shadow.png');
     this.game.load.tilemap('level1', 'assets/maps/level1.json', null, Phaser.Tilemap.TILED_JSON);
+
+    this.game.load.spritesheet('ninja', 'assets/images/ninja.png',16, 18, 25)
+    this.game.load.spritesheet('shadow', 'assets/images/shadow.png',16, 18, 25)
 
 
     // Music Track
