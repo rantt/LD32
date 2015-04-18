@@ -15,7 +15,7 @@ var Player = function(game) {
   this.facing = 'right';
   this.wasStanding = false;
 
-  this.game.load.spritesheet('ninja', 'assets/images/ninja', 18, 20, 25);
+  // this.game.load.spritesheet('ninja', 'assets/images/ninja2.png', 18, 18, 25);
   this.ninja = this.game.add.sprite(32,32, 'ninja');
   this.game.physics.arcade.enable(this.ninja);
   
@@ -80,19 +80,36 @@ Player.prototype = {
       }
     }
 
+
+    //Show Attack Frame
+    if (spaceKey.isDown) {
+      if (this.facing === 'left') {
+        if (this.ninja.body.blocked.down === false) {
+          this.ninja.frame = 11;
+        }else {
+          this.ninja.frame = 9;
+        }
+      }else {
+        if (this.ninja.body.blocked.down === false) {
+          this.ninja.frame = 10;
+        }else {
+          this.ninja.frame = 8;
+        }
+      }
+    }
+
     if (!standing && this.wasStanding) {
       this.edgeTimer = this.game.time.now + 250;
     }
 
-    if ((standing || this.game.time.now <= this.edgeTimer) && spaceKey.isDown && this.game.time.now > this.jumpTimer) {
-      console.log('jumping');
+    if ((standing || this.game.time.now <= this.edgeTimer) && wKey.isDown && this.game.time.now > this.jumpTimer) {
       this.ninja.body.velocity.y = -this.jumpSpeed;
       this.jumpTimer = this.game.time.now + 750;
     }
     this.wasStanding = standing;
 
     //Lower Jump Height if released early
-    spaceKey.onUp.add(function() {
+    wKey.onUp.add(function() {
       if (this.ninja.body.velocity.y < -150) {
         this.ninja.body.velocity.y = -100;
       }

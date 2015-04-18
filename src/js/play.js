@@ -23,16 +23,13 @@ Game.Play.prototype = {
 
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    this.map = this.game.add.tilemap('level1');
+    this.map = this.game.add.tilemap('level2');
     this.map.addTilesetImage('tiles', 'tiles');
     this.map.setCollision(2);
     
     this.layer = this.map.createLayer('layer1') 
 
     this.layer.resizeWorld();
-
-    console.log(this.map.getObjectIndex('start'))
-    console.log(this.map.getObjectIndex('end'))
 
     this.player = new Player(this.game);
 

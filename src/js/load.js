@@ -1,6 +1,6 @@
 // var tileSize = 64,
-var tileSize = 16,
-rows = 10,
+var tileSize = 20,
+rows = 12,
 cols = 12;
 
 var Game = {
@@ -68,9 +68,10 @@ Game.Load.prototype = {
     this.game.load.image('player', 'assets/images/player.png');
     this.game.load.image('shadow', 'assets/images/shadow.png');
     this.game.load.tilemap('level1', 'assets/maps/level1.json', null, Phaser.Tilemap.TILED_JSON);
+    this.game.load.tilemap('level2', 'assets/maps/level2.json', null, Phaser.Tilemap.TILED_JSON);
 
-    this.game.load.spritesheet('ninja', 'assets/images/ninja.png',16, 18, 25)
-    this.game.load.spritesheet('shadow', 'assets/images/shadow.png',16, 18, 25)
+    this.game.load.spritesheet('ninja', 'assets/images/Ninja2.png',18, 18, 25)
+    // this.game.load.spritesheet('shadow', 'assets/images/shadow.png',16, 18, 25)
 
 
     // Music Track
