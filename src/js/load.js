@@ -68,7 +68,7 @@ Game.Load.prototype = {
     this.game.load.image('background_day', 'assets/images/day.png');
     // this.game.load.image('background', 'assets/images/background3.png');
 
-    this.game.load.spritesheet('tiles', 'assets/images/tiles.png', 20, 20, 8);
+    this.game.load.spritesheet('tiles', 'assets/images/tiles.png', 20, 20, 12);
     // this.game.load.image('player', 'assets/images/player.png');
     // this.game.load.image('shadow', 'assets/images/shadow.png');
     // this.game.load.image('crate', 'assets/images/crate.png', 20, 20);
@@ -79,6 +79,7 @@ Game.Load.prototype = {
     this.game.load.tilemap('map_day', 'assets/maps/day.json', null, Phaser.Tilemap.TILED_JSON);
 
     this.game.load.spritesheet('ninja', 'assets/images/Ninja2.png',18, 18, 25);
+    this.game.load.spritesheet('ninja_mob', 'assets/images/NinjaMob.png',18, 18, 25);
     this.game.load.spritesheet('celery', 'assets/images/celery.png',18, 18, 7);
     // this.game.load.spritesheet('shadow', 'assets/images/shadow.png',16, 18, 25)
 

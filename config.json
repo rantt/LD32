@@ -1,0 +1,7 @@
+{
+  "rsync": {
+    "username": "dave",
+    "hostname": "divideby5.com",
+    "destination": "/usr/share/nginx/html/divideby5.com/games/ctd/"
+  }
+}

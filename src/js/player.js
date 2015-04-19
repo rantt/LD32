@@ -39,7 +39,7 @@ var Player = function(game) {
   //Weapons
   this.celery = this.game.add.sprite(0,0, 'celery');
   this.game.physics.arcade.enable(this.celery);
-  this.celery.anchor.setTo(0, 0.5);
+  this.celery.anchor.setTo(0.5, 0.5);
   this.celery.alive = false;
   this.celery.body.immovable = true; 
   this.celery.animations.add('swing', [0,1,2,3,4,5,6], 30, false);
@@ -136,12 +136,19 @@ Player.prototype = {
     }, this);
   },
   attack: function() {
-        this.celery.x = this.ninja.x;
-        this.celery.y = this.ninja.y;
+
+    if (this.facing === 'right' || this.ninja.frame === 0 || this.ninja.frame === 8 || this.ninja.frame === 10) {
+      this.celery.x = this.ninja.x + 10;
+    }else {
+      this.celery.x = this.ninja.x - 10;
+    }
+
+    this.celery.y = this.ninja.y;
+
     if (this.currentWeaponName === 'celery') {
       this.currentWeapon = this.celery;
       if (spaceKey.isDown && this.isAttacking === false) {
-        if (this.facing === 'right' || this.ninja.frame == 0 || this.ninja.frame == 8 || this.ninja.frame == 10) {
+        if (this.facing === 'right' || this.ninja.frame === 0 || this.ninja.frame === 8 || this.ninja.frame === 10) {
           this.celery.scale.x = 1;
         }else {
           this.celery.scale.x = -1;
