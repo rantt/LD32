@@ -14,18 +14,35 @@ var Player = function(game) {
   this.moveSpeed = 150;
   this.facing = 'right';
   this.wasStanding = false;
+  this.isAttacking = false;
+  this.currentWeaponName = 'celery';
+  this.currentWeapon = null;
+  this.standing = false;
+
+
 
   // this.game.load.spritesheet('ninja', 'assets/images/ninja2.png', 18, 18, 25);
   this.ninja = this.game.add.sprite(32,32, 'ninja');
   this.game.physics.arcade.enable(this.ninja);
   
   this.ninja.anchor.setTo(0.5, 0.5);
-  this.ninja.animations.add('right', [2, 3], 15, true);
-  this.ninja.animations.add('left', [4, 5], 15, true);
+  this.ninja.animations.add('right', [2, 3], 10, true);
+  this.ninja.animations.add('left', [4, 5], 10, true);
 
-  this.ninja.body.collideWorldBounds = true;
+  // this.ninja.body.collideWorldBounds = true;
+  // this.ninja.checkWorldBounds = true;
+  // this.ninja.outOfBoundsKill = true;
   this.ninja.body.gravity.y = 750;
   this.game.camera.follow(this.ninja, Phaser.Camera.FOLLOW_PLATFORMER);
+
+
+  //Weapons
+  this.celery = this.game.add.sprite(0,0, 'celery');
+  this.game.physics.arcade.enable(this.celery);
+  this.celery.anchor.setTo(0, 0.5);
+  this.celery.alive = false;
+  this.celery.body.immovable = true; 
+  this.celery.animations.add('swing', [0,1,2,3,4,5,6], 30, false);
 
   //Setup WASD and extra keys
   wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
@@ -40,32 +57,34 @@ var Player = function(game) {
 };
 
 Player.prototype = {
-  movements: function(layer) {
+  movements: function() {
 
-    this.game.physics.arcade.collide(this.ninja, layer);
-
-    var standing = this.ninja.body.blocked.down || this.ninja.body.touching.down;
+    this.standing = this.ninja.body.blocked.down || this.ninja.body.touching.down;
 
     this.ninja.body.velocity.x = 0;
 
     if (aKey.isDown) {
       this.ninja.body.velocity.x = -this.moveSpeed;
+        this.ninja.play('left');
       if (this.facing !== 'left') {
         // this.ninja.animations.play('left');
-        this.ninja.play('left');
         this.facing = 'left';
       }
-      if (this.ninja.body.blocked.down === false) {
+      // if (this.ninja.body.blocked.down === false) {
+      if (this.standing === false) {
         this.ninja.frame = 7;
       }
     }else if (dKey.isDown) {
       this.ninja.body.velocity.x = this.moveSpeed;
+
+        this.ninja.play('right');
       if (this.facing !== 'right') {
         // this.ninja.animations.play('right');
-        this.ninja.play('right');
+        // this.ninja.play('right');
         this.facing = 'right';
       }
-      if (this.ninja.body.blocked.down === false) {
+      // if (this.ninja.body.blocked.down === false) {
+      if (this.standing === false) {
         this.ninja.frame = 6;
       }
     }else {
@@ -76,7 +95,7 @@ Player.prototype = {
         }else {
           this.ninja.frame = 0;
         }
-        facing = 'idle';
+        // this.facing = 'idle';
       }
     }
 
@@ -96,17 +115,18 @@ Player.prototype = {
           this.ninja.frame = 8;
         }
       }
+      this.attack();
     }
 
-    if (!standing && this.wasStanding) {
+    if (!this.standing && this.wasStanding) {
       this.edgeTimer = this.game.time.now + 250;
     }
 
-    if ((standing || this.game.time.now <= this.edgeTimer) && wKey.isDown && this.game.time.now > this.jumpTimer) {
+    if ((this.standing || this.game.time.now <= this.edgeTimer) && wKey.isDown && this.game.time.now > this.jumpTimer) {
       this.ninja.body.velocity.y = -this.jumpSpeed;
       this.jumpTimer = this.game.time.now + 750;
     }
-    this.wasStanding = standing;
+    this.wasStanding = this.standing;
 
     //Lower Jump Height if released early
     wKey.onUp.add(function() {
@@ -114,8 +134,33 @@ Player.prototype = {
         this.ninja.body.velocity.y = -100;
       }
     }, this);
+  },
+  attack: function() {
+        this.celery.x = this.ninja.x;
+        this.celery.y = this.ninja.y;
+    if (this.currentWeaponName === 'celery') {
+      this.currentWeapon = this.celery;
+      if (spaceKey.isDown && this.isAttacking === false) {
+        if (this.facing === 'right' || this.ninja.frame == 0 || this.ninja.frame == 8 || this.ninja.frame == 10) {
+          this.celery.scale.x = 1;
+        }else {
+          this.celery.scale.x = -1;
+        }
+        this.celery.reset(this.ninja.x, this.ninja.y);
+        this.celery.play('swing');
+        this.isAttacking = true;
+
+        this.celery.events.onAnimationComplete.add(function() {
+          this.celery.kill();
+        }, this);
+      }
+    }
+
+    spaceKey.onUp.add(function() {
+      this.isAttacking = false;
+      this.currentWeapon = null;
+    }, this);
 
 
-
-  }
+  },
 };

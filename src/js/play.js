@@ -21,13 +21,22 @@ Game.Play.prototype = {
   create: function() {
     this.game.world.setBounds(0, 0 ,Game.w ,Game.h);
 
+    // this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'background');
+    // this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
+    this.game.add.tileSprite(0, 0, 240, 240, 'background');
+
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     this.map = this.game.add.tilemap('level2');
     this.map.addTilesetImage('tiles', 'tiles');
+    // this.map.setCollision(1);
     this.map.setCollision(2);
+    this.map.setCollision(3);
+    this.map.setCollision(4);
+    this.map.setCollision(5);
+    this.map.setCollision(6);
     
-    this.layer = this.map.createLayer('layer1') 
+    this.layer = this.map.createLayer('layer1'); 
 
     this.layer.resizeWorld();
 
@@ -60,7 +69,7 @@ Game.Play.prototype = {
   //   }
   // },
   render: function() {
-    this.game.debug.body(this.player.ninja);
+    // this.game.debug.body(this.player.ninja);
   //   this.game.debug.text('Meditating: ' + this.meditating, 32, 96);
   }
 
