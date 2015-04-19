@@ -4,7 +4,7 @@ var sKey;
 var dKey;
 
 
-var Player = function(game) {
+var Player = function(game,x, y) {
   this.game = game;
   this.ninja = null;
 
@@ -20,16 +20,16 @@ var Player = function(game) {
   this.standing = false;
 
 
-
   // this.game.load.spritesheet('ninja', 'assets/images/ninja2.png', 18, 18, 25);
-  this.ninja = this.game.add.sprite(32,32, 'ninja');
+  this.ninja = this.game.add.sprite(x,y, 'ninja');
+  this.ninja.health = 100;
   this.game.physics.arcade.enable(this.ninja);
-  
   this.ninja.anchor.setTo(0.5, 0.5);
+  this.ninja.body.setSize(10, 18);
   this.ninja.animations.add('right', [2, 3], 10, true);
   this.ninja.animations.add('left', [4, 5], 10, true);
 
-  // this.ninja.body.collideWorldBounds = true;
+  this.ninja.body.collideWorldBounds = true;
   // this.ninja.checkWorldBounds = true;
   // this.ninja.outOfBoundsKill = true;
   this.ninja.body.gravity.y = 750;
@@ -43,6 +43,10 @@ var Player = function(game) {
   this.celery.alive = false;
   this.celery.body.immovable = true; 
   this.celery.animations.add('swing', [0,1,2,3,4,5,6], 30, false);
+
+
+
+
 
   //Setup WASD and extra keys
   wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
@@ -65,6 +69,7 @@ Player.prototype = {
 
     if (aKey.isDown) {
       this.ninja.body.velocity.x = -this.moveSpeed;
+      this.ninja.body.setSize(10, 18, 2, 0);
         this.ninja.play('left');
       if (this.facing !== 'left') {
         // this.ninja.animations.play('left');
@@ -76,7 +81,7 @@ Player.prototype = {
       }
     }else if (dKey.isDown) {
       this.ninja.body.velocity.x = this.moveSpeed;
-
+      this.ninja.body.setSize(10, 18, -2, 0);
         this.ninja.play('right');
       if (this.facing !== 'right') {
         // this.ninja.animations.play('right');
@@ -88,15 +93,17 @@ Player.prototype = {
         this.ninja.frame = 6;
       }
     }else {
-      if (this.facing !== 'idle') {
+      // if (this.facing !== 'idle') {
         this.ninja.animations.stop();
+        
+        this.ninja.body.setSize(10, 18, 0, 0);
         if(this.facing === 'left') {
           this.ninja.frame = 1;
         }else {
           this.ninja.frame = 0;
         }
         // this.facing = 'idle';
-      }
+      // }
     }
 
 
@@ -137,10 +144,11 @@ Player.prototype = {
   },
   attack: function() {
 
-    if (this.facing === 'right' || this.ninja.frame === 0 || this.ninja.frame === 8 || this.ninja.frame === 10) {
-      this.celery.x = this.ninja.x + 10;
+    // if (this.facing === 'right' || this.ninja.frame === 0 || this.ninja.frame === 8 || this.ninja.frame === 10) {
+    if (this.facing === 'right') {
+      this.celery.x = this.ninja.x + 18;
     }else {
-      this.celery.x = this.ninja.x - 10;
+      this.celery.x = this.ninja.x - 18;
     }
 
     this.celery.y = this.ninja.y;
@@ -148,7 +156,8 @@ Player.prototype = {
     if (this.currentWeaponName === 'celery') {
       this.currentWeapon = this.celery;
       if (spaceKey.isDown && this.isAttacking === false) {
-        if (this.facing === 'right' || this.ninja.frame === 0 || this.ninja.frame === 8 || this.ninja.frame === 10) {
+        // if (this.facing === 'right' || this.ninja.frame === 0 || this.ninja.frame === 8 || this.ninja.frame === 10) {
+        if (this.facing === 'right') {
           this.celery.scale.x = 1;
         }else {
           this.celery.scale.x = -1;

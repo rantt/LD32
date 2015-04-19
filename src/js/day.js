@@ -65,8 +65,11 @@ Game.Day.prototype = {
     },this);
 
     this.mobs.forEach(function(mob) {
-      console.log('ima mob');
+      mob.x = mob.x + mob.width/2;
+      mob.y = mob.y + mob.height/2;
       mob.body.immovable = true;
+      mob.anchor.setTo(0.5, 0.5);
+      mob.body.setSize(10,18);
       // mob.body.gravity.y = 750;
       mob.initialx = mob.x;
       // mob.initialy = mob.y;
@@ -82,8 +85,14 @@ Game.Day.prototype = {
 
     },this);
 
+    this.startX = 32;
+    this.startY = 180;
+    this.player = new Player(this.game, this.startX, this.startY);
 
-    this.player = new Player(this.game);
+
+    // this.playerHealthText = this.game.add.bitmapText(32, 32, 'minecraftia', 'Health', 12);
+    this.playerHealthBar = this.game.add.sprite(8, 8, this.drawRect(64, 4, '#33ff00'));
+    this.playerHealthBar.fixedToCamera = true;
 
     this.crate_emitter = this.game.add.emitter(0, 0, 100);
     this.crate_emitter.makeParticles('crate_debris');
@@ -97,24 +106,43 @@ Game.Day.prototype = {
     // this.music.play('',0,1,true);
 
   },
-
+  drawRect:  function(width, height, color) {
+    var bmd = this.game.add.bitmapData(width, height);
+    bmd.ctx.beginPath();
+    bmd.ctx.rect(0, 0, width, height);
+    bmd.ctx.fillStyle = color;
+    bmd.ctx.fill();
+    return bmd;
+  },
   update: function() {
     // this.game.physics.arcade.collide(this.player.ninja, this.crates);
     
     // this.game.physics.arcade.overlap(this.player.ninja, this.crates, function() {
     // },null, this);
+
+    if (this.player.ninja.y >= this.map.tileWidth*this.map.height-this.player.ninja.height) {
+      //player fell down a pit
+      this.playerDead();
+    }
+    
+    this.playerHealthBar.scale.x = this.player.ninja.health/100;
     
     this.game.physics.arcade.collide(this.player.ninja, this.layer);
     this.game.physics.arcade.collide(this.player.ninja, this.crates);
-    this.game.physics.arcade.collide(this.player.ninja, this.mobs);
+    // this.game.physics.arcade.collide(this.player.ninja, this.mobs);
+    this.game.physics.arcade.overlap(this.player.ninja, this.mobs, this.playerHit, null, this);
     
     this.game.physics.arcade.collide(this.mobs, this.layer);
-    this.game.physics.arcade.overlap(this.mobs, this.layer, this.mobBounce, null, this);
-    this.game.physics.arcade.overlap(this.mobs, this.crates, this.mobBounce, null, this);
+    // this.game.physics.arcade.overlap(this.mobs, this.layer, this.mobBounce, null, this);
+    // this.game.physics.arcade.overlap(this.mobs, this.crates, this.mobBounce, null, this);
+    
     this.game.physics.arcade.overlap(this.player.currentWeapon, this.mobs, this.killMobs, null, this);
     this.game.physics.arcade.overlap(this.player.currentWeapon, this.crates, this.breakCrate, null, this);
+    // this.game.debug.body(this.player.ninja);
+
 
     this.mobs.forEach(function(mob) {
+      // this.game.debug.body(mob);
       if (mob.patrol) {
         if (mob.x < mob.minX) {
           mob.body.velocity.x = this.mobSpeed;
@@ -124,24 +152,6 @@ Game.Day.prototype = {
           mob.play('left');
         }
       }
-      // mob.direction *= -1;
-
-      // if (mob.direction < 0) {
-      //   mob.body.velocity.x = this.mobSpeed;
-      //   mob.play('right');
-      // }else {
-      //   mob.body.velocity.x = -this.mobSpeed;
-      //   mob.play('left');
-      // }
-      // if (mob.body.blocked.left || mob.body.blocked.right) {
-      //   mob.direction *= -1;
-      // }
-
-
-      // var standing = mob.body.blocked.down || mob.body.touching.down;
-      // if (!standing) {
-      //   this.mobBounce(mob, this.layer);
-      // }
     },this);
 
     this.player.movements(this.layer);
@@ -149,6 +159,27 @@ Game.Day.prototype = {
     // // Toggle Music
     // muteKey.onDown.add(this.toggleMute, this);
 
+  },
+  playerHit:  function(ninja, mob) {
+    if (this.takingDmg) {return;}
+    this.takingDmg = true;
+    
+    if (mob.alive === true) {
+      ninja.health -= 10;
+    }
+
+    // this.game.add.tween(ninja).to({x: ninja.x + 20},10).start();
+    var t = this.game.add.tween(ninja).to({alpha: 0},200).to({alpha: 1}, 200).start();
+    t.onComplete.add(function() {
+      this.takingDmg = false;
+      if (ninja.health <= 0) {
+        this.playerDead();
+      }
+    },this);
+  },
+  playerDead: function() {
+    this.player.ninja.reset(this.startX, this.startY);
+    this.player.ninja.health = 100;
   },
   breakCrate: function(weapon, crate) {
     this.crate_emitter.x = crate.x;
@@ -169,6 +200,7 @@ Game.Day.prototype = {
     // mob.body.velocity.x *= -1;
   },
   killMobs: function(weapon, mob) {
+   mob.alive = false;
    var t = this.game.add.tween(mob).to({tint: 0xff0000},10).to({tint: 0xfff392}, 10).start(); 
 
    t.onComplete.add(function() {
@@ -188,6 +220,9 @@ Game.Day.prototype = {
     // this.game.debug.body(this.player.celery);
     // this.game.debug.text('Standing: ' + this.player.standing, 32, this.game.height - 96);
     // this.game.debug.text('facing: ' + this.player.facing, 32, this.game.height - 64);
+
+    // this.game.debug.text('playerx: ' + this.player.ninja.y, 32, this.game.height - 96);
+    // this.game.debug.text('map limit ' + this.map.tileWidth*this.map.height, 32, this.game.height - 64);
   }
 
 };
