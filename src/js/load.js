@@ -79,6 +79,7 @@ Game.Load.prototype = {
     this.game.load.tilemap('level2', 'assets/maps/level2.json', null, Phaser.Tilemap.TILED_JSON);
     this.game.load.tilemap('map_day', 'assets/maps/day.json', null, Phaser.Tilemap.TILED_JSON);
     this.game.load.tilemap('map_carrot', 'assets/maps/king_carrot.json', null, Phaser.Tilemap.TILED_JSON);
+    this.game.load.tilemap('map_cage', 'assets/maps/the_cage.json', null, Phaser.Tilemap.TILED_JSON);
 
     this.game.load.spritesheet('ninja', 'assets/images/Ninja2.png',18, 18, 25);
     this.game.load.spritesheet('ninja_mob', 'assets/images/NinjaMob.png',18, 18, 25);

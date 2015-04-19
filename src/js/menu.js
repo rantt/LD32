@@ -23,6 +23,7 @@ Game.Menu.prototype =  {
       if (this.game.input.activePointer.isDown){
         // this.game.state.start('Day');
         this.game.state.start('Carrot');
+        // this.game.state.start('Cage');
       }
     }
 };

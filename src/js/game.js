@@ -8,6 +8,7 @@ game.state.add('Load', Game.Load);
 game.state.add('Menu', Game.Menu);
 game.state.add('Day', Game.Day);
 game.state.add('Carrot', Game.Carrot);
+game.state.add('Cage', Game.Cage);
 game.state.add('Play', Game.Play);
 
 game.state.start('Boot');
