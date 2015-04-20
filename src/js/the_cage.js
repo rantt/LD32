@@ -20,6 +20,8 @@ Game.Cage = function(game) {
 Game.Cage.prototype = {
   create: function() {
     this.game.world.setBounds(0, 0 ,Game.w ,Game.h);
+    this.killCount = 0;
+    this.attackTimer = this.game.time.now + 1500;
 
     // this.game.add.tileSprite(0, 0, 1920, 200, 'background_day');
 
@@ -30,6 +32,8 @@ Game.Cage.prototype = {
     this.directionLock = false;
 
     this.map = this.game.add.tilemap('map_cage');
+
+    // this.score = this.game.add.bitmapText(Game.w/2, 40, 'minecraftia', 'Kills:', 12);
 
     // this.game.add.tileSprite(0, 0, 1920, 200, 'background_day');
     this.game.add.tileSprite(0, 0, this.map.tileWidth*this.map.width, this.map.tileWidth*this.map.height, 'background_day');
@@ -92,6 +96,8 @@ Game.Cage.prototype = {
     this.crate_emitter.minParticleSpeed.setTo(-100, -100);
     this.crate_emitter.maxParticleSpeed.setTo(100, 100);
 
+    this.score = this.game.add.bitmapText(Game.w/2+50, 10, 'minecraftia', 'Kills:', 12);
+    this.winner = this.game.add.bitmapText(Game.w/2-40, Game.h/2, 'minecraftia', 'You WIN!', 12);
     // // Music
     // this.music = this.game.add.sound('music');
     // this.music.volume = 0.5;
@@ -111,6 +117,24 @@ Game.Cage.prototype = {
     
     // this.game.physics.arcade.overlap(this.player.ninja, this.crates, function() {
     // },null, this);
+    this.score.setText('Kills: ' + this.killCount);
+
+    this.mobs.forEach(function(mob) {
+      mob.body.velocity.x = mob.direction*this.mobSpeed;
+      if (mob.direction < 0) {
+        mob.play('left');
+      }else {
+        mob.play('right');
+      }
+    },this);
+
+    if (this.game.time.now > this.attackTimer) {
+      var m = this.mobs.getFirstDead();
+      m.body.velocity.x = this.mobSpeed;
+      m.reset(Game.w/2, 40);
+      this.attackTimer = this.game.time.now + 2000;
+    }
+
 
     if (this.player.ninja.y >= this.map.tileWidth*this.map.height-this.player.ninja.height) {
       //player fell down a pit
@@ -177,6 +201,8 @@ Game.Cage.prototype = {
   playerDead: function() {
     this.player.ninja.reset(this.startX, this.startY);
     this.player.ninja.health = 100;
+    this.killCount = 0;
+    this.mobs.callAll('kill');
   },
   breakCrate: function(weapon, crate) {
     this.crate_emitter.x = crate.x;
@@ -198,11 +224,14 @@ Game.Cage.prototype = {
   },
   killMobs: function(weapon, mob) {
    mob.alive = false;
-   var t = this.game.add.tween(mob).to({tint: 0xff0000},10).to({tint: 0xfff392}, 10).start(); 
-
-   t.onComplete.add(function() {
-    mob.kill();
-   }, this);
+   mob.kill();
+   this.killCount += 1;
+   // var t = this.game.add.tween(mob).to({tint: 0xff0000},10).to({tint: 0xfff392}, 10).start(); 
+   //
+   // t.onComplete.add(function() {
+   //  mob.kill();
+   //  this.killCount += 1;
+   // }, this);
   },
   // toggleMute: function() {
   //   if (musicOn == true) {

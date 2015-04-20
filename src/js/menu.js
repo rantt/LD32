@@ -23,14 +23,14 @@ Game.Menu.prototype =  {
     update: function() {
       //Click to Start
       if (this.game.input.activePointer.isDown){
-        // this.game.state.start('Day');
+        this.game.state.start('Day');
 
         this.music = this.game.add.sound('music');
         this.music.play('', 0, 0.3, true);
 
         // this.music.volume.0.4;
         // this.music.play();
-        this.game.state.start('Carrot');
+        // this.game.state.start('Carrot');
         // this.game.state.start('Cage');
       }
     }
