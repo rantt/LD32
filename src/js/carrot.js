@@ -21,6 +21,19 @@ Game.Carrot.prototype = {
   create: function() {
     this.game.world.setBounds(0, 0 ,Game.w ,Game.h);
 
+    this.stompSnd = this.game.add.sound('stomp');
+    this.stompSnd.volume = 0.5;
+
+    this.hitSnd = this.game.add.sound('player_hit');
+    this.hitSnd.volume = 0.5;
+
+    this.deadSnd = this.game.add.sound('boss_dead');
+    this.deadSnd.volume = 0.5;
+
+    this.mobSnd = this.game.add.sound('mob_hit'); 
+    this.mobSnd.volume = 0.5;
+      
+
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     this.attackTimer = this.game.time.now;
@@ -126,6 +139,13 @@ Game.Carrot.prototype = {
     this.crate_emitter.minParticleSpeed.setTo(-100, -100);
     this.crate_emitter.maxParticleSpeed.setTo(100, 100);
 
+
+    this.carrot_emitter = this.game.add.emitter(0, 0, 100);
+    this.carrot_emitter.makeParticles('carrot');
+    this.carrot_emitter.gravity = 500;
+    this.carrot_emitter.minParticleSpeed.setTo(-100, -100);
+    this.carrot_emitter.maxParticleSpeed.setTo(100, 100);
+
     // // Music
     // this.music = this.game.add.sound('music');
     // this.music.volume = 0.5;
@@ -163,18 +183,12 @@ Game.Carrot.prototype = {
       }
     },this);
 
+    if (this.player.ninja.x >= 235 && this.carrotKing.alive === false) {
+      this.game.state.start('Cage');
+    } 
 
-    // console.log(this.player.ninja.x);
-    // console.log(this.player.direction);
-
-    // if (this.player.ninja.x < 30) {
-    //   this.player.direction = -1;
-    // }else if(this.player.ninja.x > 210) {
-    //   this.player.direction = 1;
-    // }
-    
-    
-    if (this.game.time.now > this.attackTimer + 5000){
+    // if (this.game.time.now > this.attackTimer + 5000 && this.carrotKing.alive){
+    if (this.game.time.now > this.attackTimer + 5000 && this.carrotKing.alive){
       this.attackAnimTimer = this.game.time.now + 2000;
       this.carrotAttack();
       console.log(this.carrotKing.animations.currentAnim.name);
@@ -183,9 +197,11 @@ Game.Carrot.prototype = {
       if (this.carrotKing.animations.currentAnim.name !== 'idle') {
         this.carrotKing.play('idle');
 
-        var m = this.mobs.getFirstDead();
-        m.body.velocity.x = this.mobSpeed;
-        m.reset(160,760);
+        if (this.carrotKing.alive) {
+          var m = this.mobs.getFirstDead();
+          m.body.velocity.x = this.mobSpeed;
+          m.reset(160,760);
+        }
 
       }
     }
@@ -228,12 +244,19 @@ Game.Carrot.prototype = {
       this.kingTakingDmg = false;
       if (carrotKing.health <= 0) {
         // this.playerDead();
+        // carrotKing.kill();
+        this.carrot_emitter.x = carrotKing.x;
+        this.carrot_emitter.y = carrotKing.y;
+        this.carrot_emitter.start(true, 1000, null, 128);
         carrotKing.kill();
+        this.deadSnd.play();
+
       }
     },this);
 
   },
   killMobs: function(weapon, mob) {
+   this.mobSnd.play(); 
    mob.alive = false;
    var t = this.game.add.tween(mob).to({tint: 0xff0000},10).to({tint: 0xfff392}, 10).start(); 
 
@@ -248,12 +271,12 @@ Game.Carrot.prototype = {
   carrotAttack: function() {
     this.carrotKing.animations.stop();
     this.carrotKing.play('attack');
-    this.attackTimer = this.game.time.now + 4000;
+    this.attackTimer = this.game.time.now + 1000;
     
     // this.m = this.mobs.getFirstDead();
     // this.m.body.velocity.x = this.mobSpeed;
     // this.m.reset(160,760);
-
+    this.stompSnd.play();
 
     // for(var i = 0; i < this.game.rnd.between(0,6);i++) {
     for(var i = 0; i < 10;i++) {
@@ -265,10 +288,12 @@ Game.Carrot.prototype = {
   playerHit:  function(ninja, enemy) {
     if (this.takingDmg) {return;}
     this.takingDmg = true;
+
+    this.hitSnd.play();
     
     if (enemy.alive === true) {
       if (enemy.key === 'carrot') {
-        ninja.health -= 20;
+        ninja.health -= 25;
       }else {
         ninja.health -= 10;
       }
@@ -286,6 +311,7 @@ Game.Carrot.prototype = {
   playerDead: function() {
     this.player.ninja.reset(this.startX, this.startY);
     this.player.ninja.health = 100;
+    this.carrotKing.health = 100;
     this.mobs.callAll('kill');
     this.carrots.callAll('kill');
   },

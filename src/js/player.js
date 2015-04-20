@@ -8,6 +8,13 @@ var Player = function(game,x, y) {
   this.game = game;
   this.ninja = null;
 
+  this.jumpSnd = this.game.add.sound('jump');
+  this.jumpSnd.volume = 0.5;
+
+
+  this.slashSnd = this.game.add.sound('slash');
+  this.slashSnd.volume = 0.2;
+
   this.edgeTimer = 0;
   this.jumpSpeed = 350;
   this.jumpTimer = 0;
@@ -18,7 +25,6 @@ var Player = function(game,x, y) {
   this.currentWeaponName = 'celery';
   this.currentWeapon = null;
   this.standing = false;
-
 
   // this.game.load.spritesheet('ninja', 'assets/images/ninja2.png', 18, 18, 25);
   this.ninja = this.game.add.sprite(x,y, 'ninja');
@@ -56,6 +62,7 @@ var Player = function(game,x, y) {
   // muteKey = game.input.keyboard.addKey(Phaser.Keyboard.M);
 
   spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+  this.cursors = this.game.input.keyboard.createCursorKeys();
 
 
 };
@@ -67,7 +74,7 @@ Player.prototype = {
 
     this.ninja.body.velocity.x = 0;
 
-    if (aKey.isDown) {
+    if (aKey.isDown || this.cursors.left.isDown) {
       this.ninja.body.velocity.x = -this.moveSpeed;
       this.ninja.body.setSize(10, 18, 2, 0);
         this.ninja.play('left');
@@ -79,7 +86,7 @@ Player.prototype = {
       if (this.standing === false) {
         this.ninja.frame = 7;
       }
-    }else if (dKey.isDown) {
+    }else if (dKey.isDown || this.cursors.right.isDown) {
       this.ninja.body.velocity.x = this.moveSpeed;
       this.ninja.body.setSize(10, 18, -2, 0);
         this.ninja.play('right');
@@ -129,7 +136,9 @@ Player.prototype = {
       this.edgeTimer = this.game.time.now + 250;
     }
 
-    if ((this.standing || this.game.time.now <= this.edgeTimer) && wKey.isDown && this.game.time.now > this.jumpTimer) {
+    if ((this.standing || this.game.time.now <= this.edgeTimer) && (wKey.isDown || this.cursors.up.isDown) && this.game.time.now > this.jumpTimer) {
+
+      this.jumpSnd.play();
       this.ninja.body.velocity.y = -this.jumpSpeed;
       this.jumpTimer = this.game.time.now + 750;
     }
@@ -141,6 +150,13 @@ Player.prototype = {
         this.ninja.body.velocity.y = -100;
       }
     }, this);
+
+    this.cursors.up.onUp.add(function() {
+      if (this.ninja.body.velocity.y < -150) {
+        this.ninja.body.velocity.y = -100;
+      }
+    }, this);
+
   },
   attack: function() {
 
@@ -156,6 +172,7 @@ Player.prototype = {
     if (this.currentWeaponName === 'celery') {
       this.currentWeapon = this.celery;
       if (spaceKey.isDown && this.isAttacking === false) {
+          this.slashSnd.play();
         // if (this.facing === 'right' || this.ninja.frame === 0 || this.ninja.frame === 8 || this.ninja.frame === 10) {
         if (this.facing === 'right') {
           this.celery.scale.x = 1;

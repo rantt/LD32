@@ -26,6 +26,12 @@ Game.Day.prototype = {
     // this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'background');
     // this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
 
+    this.hitSnd = this.game.add.sound('player_hit');
+    this.hitSnd.volume = 0.5;
+
+    this.mobSnd = this.game.add.sound('mob_hit');
+    this.mobSnd.volume = 0.5;
+
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     this.map = this.game.add.tilemap('map_day');
@@ -39,6 +45,10 @@ Game.Day.prototype = {
     this.map.setCollision(4);
     this.map.setCollision(5);
     this.map.setCollision(6);
+
+    //Carrot Bricks
+    this.map.setCollision(11);
+    this.map.setCollision(12);
     // this.map.createFromObjects('objects', 8, 'crate', 0, true, false, this.crates); 
     
     this.layer = this.map.createLayer('layer1'); 
@@ -46,6 +56,9 @@ Game.Day.prototype = {
 
     this.crates = this.game.add.group();
     this.crates.enableBody = true;
+
+    this.exits = this.game.add.group();
+    this.exits.enableBody = true;
     // this.crates.immovable = true;
     //
     this.mobs = this.game.add.group();
@@ -54,6 +67,7 @@ Game.Day.prototype = {
 
     this.map.createFromObjects('objects', 8, 'tiles', 7, true, false, this.crates); 
     this.map.createFromObjects('objects', 9, 'ninja_mob', 0, true, false, this.mobs); 
+    this.map.createFromObjects('objects', 10, 'tiles', 9, true, false, this.exits); 
 
     this.crates.forEach(function(crate) {
       crate.body.immovable = true;
@@ -131,6 +145,7 @@ Game.Day.prototype = {
     this.game.physics.arcade.collide(this.player.ninja, this.crates);
     // this.game.physics.arcade.collide(this.player.ninja, this.mobs);
     this.game.physics.arcade.overlap(this.player.ninja, this.mobs, this.playerHit, null, this);
+    this.game.physics.arcade.overlap(this.player.ninja, this.exits, this.nextLevel, null, this);
     
     this.game.physics.arcade.collide(this.mobs, this.layer);
     // this.game.physics.arcade.overlap(this.mobs, this.layer, this.mobBounce, null, this);
@@ -160,10 +175,14 @@ Game.Day.prototype = {
     // muteKey.onDown.add(this.toggleMute, this);
 
   },
+  nextLevel: function(ninja, exit) {
+      this.game.state.start(exit.destination);
+  },
   playerHit:  function(ninja, mob) {
     if (this.takingDmg) {return;}
     this.takingDmg = true;
-    
+    this.hitSnd.play();
+
     if (mob.alive === true) {
       ninja.health -= 10;
     }
@@ -200,6 +219,7 @@ Game.Day.prototype = {
     // mob.body.velocity.x *= -1;
   },
   killMobs: function(weapon, mob) {
+   this.mobSnd.play();
    mob.alive = false;
    var t = this.game.add.tween(mob).to({tint: 0xff0000},10).to({tint: 0xfff392}, 10).start(); 
 

@@ -93,6 +93,15 @@ Game.Load.prototype = {
 
     // Music Track
     // this.game.load.audio('music','soundtrack.mp3');
+    this.game.load.audio('music', 'assets/audio/LD32.mp3');
+
+    //load sfx
+    this.game.load.audio('boss_dead', 'assets/audio/boss_dead.wav'); 
+    this.game.load.audio('jump', 'assets/audio/jump.wav'); 
+    this.game.load.audio('mob_hit', 'assets/audio/mob_hit.wav'); 
+    this.game.load.audio('player_hit', 'assets/audio/player_hit.wav'); 
+    this.game.load.audio('slash', 'assets/audio/slash.wav'); 
+    this.game.load.audio('stomp', 'assets/audio/stomp.wav'); 
 
   },
   create: function() {
